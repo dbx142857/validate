@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>活动列表</title>
+    <script src="http://lib.sinaapp.com/js/underscore/1.4.4/underscore-min.js"></script>
+    <script src="../validate.js"></script>
+    </head>
+<body>
+请按F12查看控制台
+</body>
+</html>
+<script>
+    var $scope={};
+    var bs={
+        lenRule:function(name,minL,maxL){//兼容validate.js的长度检测
+            minL=minL||1;
+            maxL=maxL||8;
+            return [
+                [
+                    function(val){
+                        var len=val.length;
+                        return (len>=minL)&&(len<=maxL);
+                    },
+                    name+'格式错误,长度应在'+minL+'到'+maxL+'之间'
+                ],
+                [
+                    function(val){
+                        return new RegExp("^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]|[a-zA-Z0-9])*$").test(val);
+                    },
+                    name+'格式错误，请不要包含特殊字符'
+                ]
+            ];
+        }
+    }
+    $scope.formData = {
+        a: '',
+        b: '',
+        c: '',
+        d: '',
+        e: [],
+        f: '',
+        g: ''
+    };
+    var obj = {
+
+        a: {
+            name: '抽奖名称',
+            type: 'string',
+            rules: bs.lenRule('抽奖名称')
+        },
+        b: {
+            name: '抽奖开始时间',
+            type: 'date',
+            format: 'y/m/d h:i:s'
+        },
+        c: {
+            name: '抽奖失效时间',
+            type: 'date',
+            format: 'y/m/d h:i:s'
+        },
+        d: {
+            type: 'int',
+            name: '红包总数'
+        },
+        e: {
+            type: 'array',
+            name: '选择红包',
+            rules: [
+                [
+                    function (val) {
+                        return val.length > 0;
+                    },
+                    '请选择至少一个红包'
+                ]
+            ]
+        },
+        f: {
+            type: 'string',
+            name: '抽奖开关',
+            rules: [
+                [
+                    function (val) {
+                        return ['1', '0'].indexOf(val) !== -1;
+                    },
+                    '抽奖开关未选择或者非法'
+                ]
+            ]
+        },
+        _additionalRules: [
+            [
+                function () {
+                    return new Date(this.c).getTime() - new Date(this.b).getTime() > 0;
+                },
+                '抽奖结束时间不能小于开始时间哦'
+            ]
+        ]
+    };
+    var handleValidateResult = function (result) {
+        console.log('result is:',result);
+    }
+
+    V(obj, $scope.formData, handleValidateResult);
+</script>
+
+
